@@ -1,0 +1,58 @@
+﻿
+@model DynamicMenuProject.View_Models.MenuViewModel
+
+@{
+    ViewData["Title"] = "CreateMenu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-6">
+        <!-- general form elements -->
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Create Menu</h3>
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form method="post">
+                <div class="card-body">
+                    <div asp-validation-summary="All" class="text-danger">
+                    </div>
+                    <div class="form-group">
+                        <input asp-for="Id" hidden class="form-control">
+                        <label asp-for="Name"></label>
+                        <input asp-for="Name" class="form-control" placeholder="Name">
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Path"></label>
+                        <input asp-for="Path" class="form-control" placeholder="Path">
+                        <span asp-validation-for="Path" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ParentId"></label>
+                        <input asp-for="ParentId" class="form-control" placeholder="ParentId">
+                        <span asp-validation-for="ParentId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MenuLevel"></label>
+                        <input asp-for="MenuLevel" class="form-control" placeholder="MenuLevel">
+                        <span asp-validation-for="MenuLevel" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="MenuGrpId"></label>
+                        <input asp-for="MenuGrpId" class="form-control" placeholder="MenuGrpId">
+                        <span asp-validation-for="MenuGrpId" class="text-danger"></span>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+

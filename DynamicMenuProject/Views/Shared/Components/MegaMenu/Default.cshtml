@@ -1,0 +1,42 @@
+﻿@model IEnumerable<DynamicMenuProject.View_Models.PermissionViewModel>
+<li class="nav-item">
+    <a href="/Home/Index" class="nav-link">
+        <i class="nav-icon fas fa-home"></i>
+        <p>Dashboard</p>
+    </a>
+</li>
+@{
+    foreach (var item in Model.GroupBy(m => m.MenuGrpId).Distinct().ToList())
+    {
+
+        foreach (var firstItem in (Model.Where(s => s.MenuGrpId == item.FirstOrDefault().MenuGrpId).ToList()))
+        {
+                @if (string.IsNullOrEmpty(firstItem.Path))
+                {
+                    <li class="nav-item">
+                        <a href="@firstItem.Path" class="nav-link">
+                            <i class="fas fa-circle nav-icon"></i>
+                            <p>@firstItem.Name</p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                     @*}*@
+                          @foreach (var secondItem in (Model.Where(s => s.ParentId == firstItem.Id).ToList()))
+                            {
+                                <li class="nav-item">
+                                    <a href="@secondItem.Path" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@secondItem.Name</p>
+                                    </a>
+
+                                </li>
+                            }
+                        </ul>
+
+                    </li>
+                }
+            }
+           
+        }
+    }
+   
+
