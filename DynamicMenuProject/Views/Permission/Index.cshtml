@@ -1,0 +1,50 @@
+﻿
+@model IEnumerable<DynamicMenuProject.View_Models.PermissionRoleViewModel>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1>Manage Permissions</h1>
+<table class="table table-striped" id="MyDataTable">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Role</th>
+            <th>Edit</th>
+            <th>Delete</th>
+            <th>View</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{int index = 1;}
+        @foreach (var role in Model)
+        {
+            <tr>
+                <td>@index</td>
+                <td>@role.Name</td>
+                <td>
+                    <a asp-action="EditPermission" asp-controller="Permission" asp-route-Id="@role.RoleId" class="btn btn-primary">Edit</a>
+                </td>
+                <td>
+                    <a class="btn btn-danger" asp-controller="" asp-action="" asp-route-userId="">Delete</a>
+                </td>
+                <td>
+                    <a class="btn btn-primary" asp-controller="" asp-action="" asp-route-userId="">View</a>
+                </td>
+            </tr>
+            index++;
+        }
+    </tbody>
+</table>
+@section scripts{
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.25/af-2.3.7/datatables.min.css" />
+    <script src="~/js/CustomScript.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.25/af-2.3.7/datatables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#MyDataTable").DataTable();
+        }
+        )
+    </script>
+}

@@ -129,6 +129,32 @@ namespace DynamicMenuProject.Controllers
             return View();
         }
         
+        public IActionResult Index()
+        {
+            var roleNames = (from roles in _context.Roles
+                             join
+                             menup in _context.MenuPermissions
+                             on roles.Id equals Convert.ToString(menup.RoleId)
+                             select new PermissionRoleViewModel
+                             {
+                                 Name = roles.Name,
+                                 RoleId = roles.Id
+                             }).GroupBy(n => new { n.RoleId, n.Name }).Select(g => g.FirstOrDefault()).ToList();
+
+            return View(roleNames);
+        }
+
+        //[HttpGet]
+        //public async Task<IActionResult> EditPermissions(string id)
+        //{
+            
+        //}
+        //[HttpPost]
+        //public async Task<IActionResult> EditPermissions(PermissionRoleViewModel model)
+        //{
+            
+        //}
+
         [HttpGet]
         public IActionResult GetPermissions(Guid RoleId)
         {
