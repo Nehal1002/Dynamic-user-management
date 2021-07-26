@@ -1,0 +1,106 @@
+﻿
+@model IEnumerable<DynamicMenuProject.View_Models.PermissionViewModel>
+@{
+    ViewData["Title"] = "GetPermissions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+@if (Model.Any())
+{
+    <div class="col-md-12">
+        <div class="card">
+            <!-- /.card-header -->
+            <div class="card-header">
+                <label>Select Role</label>
+                @Html.DropDownList("RoleId", (IEnumerable<SelectListItem>)ViewBag.RolesList, "Select Role")
+
+                <button id="btnSave" class="btn btn-primary fa-pull-right">Save</button>
+            </div>
+            <div class="card-body p-0">
+                <table id="idgrid" class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>Permission Id</th>
+                            <th>Name</th>
+                            <th>Path</th>
+                            <th>ParentId</th>
+                            <th>MenuLevel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var menu in Model)
+                        {
+                            <tr>
+                                <td><input type="checkbox" value="@menu.Id" checked="@menu.HasAccess" /></td>
+                                <td>@menu.Id</td>
+                                <td>@menu.Name</td>
+                                <td>@menu.Path</td>
+                                <td>@menu.ParentId</td>
+                                <td>@menu.MenuLevel</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-header">
+            No menu created yet
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">
+                Use the button below to create a menu
+            </h5>
+        </div>
+        <div class="card-footer">
+            <a class="btn btn-primary" style="width:auto"
+               asp-controller="Permission" asp-action="CreateMenu">
+                Create Menu
+            </a>
+        </div>
+    </div>
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+<script>
+
+    $(document).ready(function () {
+
+        $("#btnSave").on('click', function (e) {
+            var RoleId = $('#RoleId').val();
+            var arr = [];
+            $('#idgrid').find('input[type="checkbox"]:checked').each(function () {
+                //this is the current checkbox
+                requestData= {
+                    MenuId: this.value,
+                    RoleId: RoleId
+                }
+                arr.push(requestData);
+            });
+
+            debugger;
+            $.ajax({
+                url: '/Permission/CreatePermissions',
+                type: 'POST',
+                data: JSON.stringify(arr),
+               dataType: 'json',
+               contentType: 'application/json',
+               error: function (xhr) {
+                    alert('Error: ' + xhr.statusText);
+                },
+                success: function (result) {
+                    alert(result);
+                },
+                //async: true,
+               // processData: false
+            });
+
+        });
+    });
+</script>
