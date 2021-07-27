@@ -173,19 +173,21 @@ namespace DynamicMenuProject.Controllers
             return View(result);
         }
 
+
         [HttpPost]
         public JsonResult CreatePermissions([FromBody]UpdatePermissionViewModel[] model)
         {
             if (model != null)
             {
-                foreach (var item in model)
+                var existing = _context.MenuPermissions.Where(R => R.RoleId == model.FirstOrDefault().RoleId).ToList();
+                if (existing != null && existing.Count() > 0)
                 {
-                    var existing = _context.MenuPermissions.Where(R => R.RoleId == item.RoleId).ToList();
-                    if (existing != null && existing.Where(x => x.MenuId == item.MenuId).Count() > 0)
-                    {
-                        return Json("Permission Already Assigned!");
-                    }
-                    else
+                    return Json("Permission already assigned!");
+
+                }
+                else
+                {
+                    foreach (var item in model)
                     {
                         MenuPermissions mnp = new MenuPermissions();
                         mnp.MenuId = item.MenuId;
@@ -193,18 +195,124 @@ namespace DynamicMenuProject.Controllers
                         mnp.RoleId = item.RoleId;
                         _context.MenuPermissions.Add(mnp);
 
-
                         _context.SaveChanges();
-
-                        return Json("Saved Successfully!");
                     }
+                    return Json("Saved Successfully!");
                 }
-
             }
             return Json("NoData");
+        }
+
+        [HttpGet]
+        public IActionResult ViewPermissions(Guid RoleId)
+        {
+            List<PermissionViewModel> lstPermission = new List<PermissionViewModel>();
+
+            var result = (from Menus in _context.MenuItems
+                          join Permissions in _context.MenuPermissions.Where(r => r.RoleId == RoleId)
+                          on Menus.Id equals Permissions.MenuId into menuPerm
+                          from perm in menuPerm.DefaultIfEmpty()
+                          select new PermissionViewModel
+                          {
+                              Id = Menus.Id,
+                              Path = Menus.Path,
+                              Name = Menus.Name,
+                              ParentId = Menus.ParentId,
+                              MenuLevel = Menus.MenuLevel,
+                              HasAccess = perm == null ? false : !(string.IsNullOrEmpty(Convert.ToString(perm.RoleId)))
+                          }).ToList();
+
+            var RolesList = (from roles in _context.Roles
+                             select new SelectListItem
+                             {
+                                 Value = roles.Id,
+                                 Text = roles.Name
+                             }).ToList();
+            ViewBag.RolesList = RolesList;
+            return View(result);
+        }
+
+        [HttpGet]
+        public IActionResult DeletePermissions(Guid RoleId)
+        {
+            var permission = _context.MenuPermissions.Where(m => m.RoleId == RoleId);
+            foreach (var perm in permission)
+            {
+                _context.MenuPermissions.Remove(perm);
+            }
+            var perms = _context.MenuPermissions.FirstOrDefault(m => m.RoleId == RoleId);
+            _context.MenuPermissions.Remove(perms);
+            _context.SaveChanges();
+
+            TempData["successMessage"] = "Permissions Deleted Successfully.";
+            TempData.Keep();
+
+            return RedirectToAction("Index");
 
         }
 
+        [HttpGet]
+        public IActionResult EditPermissions(Guid RoleId)
+        {
+            ViewBag.RoleId = RoleId;
+            //List<PermissionViewModel> lstPermission = new List<PermissionViewModel>();
+
+            var result = (from Menus in _context.MenuItems
+                          join Permissions in _context.MenuPermissions.Where(r => r.RoleId == RoleId)
+                          on Menus.Id equals Permissions.MenuId into menuPerm
+                          from perm in menuPerm.DefaultIfEmpty()
+                          select new PermissionViewModel
+                          {
+                              Id = Menus.Id,
+                              Path = Menus.Path,
+                              Name = Menus.Name,
+                              ParentId = Menus.ParentId,
+                              MenuLevel = Menus.MenuLevel,
+                              HasAccess = perm == null ? false : !(string.IsNullOrEmpty(Convert.ToString(perm.RoleId)))
+                          }).ToList();
+
+            //var RolesList = (from roles in _context.Roles
+            //                 select new SelectListItem
+            //                 {
+            //                     Value = roles.Id,
+            //                     Text = roles.Name
+            //                 }).ToList();
+            //ViewBag.RolesList = RolesList;
+            return View(result);
+        }
+
+        [HttpPost]
+        public JsonResult EditPermissions([FromBody]UpdatePermissionViewModel[] model)
+        {
+            if (model != null)
+            {
+
+                int count = 0;
+                foreach (var item in model)
+                {
+                    if (count == 0)
+                    {
+                        var existing = _context.MenuPermissions.Where(R => R.RoleId == item.RoleId);
+
+                        foreach (var roles in existing)
+                        {
+                            _context.MenuPermissions.Remove(roles);
+                        }
+                        count++;
+                    }
+                    MenuPermissions mnp = new MenuPermissions();
+                    mnp.MenuId = item.MenuId;
+                    mnp.PermissionId = Guid.NewGuid();
+                    mnp.RoleId = item.RoleId;
+                    _context.MenuPermissions.Add(mnp);
+                }
+
+                _context.SaveChanges();
+
+                return Json("Saved Successfully!");
+            }
+            return Json("NoData");
+        }
 
         [HttpGet]
         public IActionResult GetPermissions(Guid RoleId)

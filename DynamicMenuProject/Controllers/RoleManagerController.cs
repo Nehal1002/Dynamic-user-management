@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DynamicMenuProject.Data;
 using DynamicMenuProject.Helpers;
 using DynamicMenuProject.Models;
 using DynamicMenuProject.View_Models;
@@ -17,11 +18,13 @@ namespace DynamicMenuProject.Controllers
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _context;
 
-        public RoleManagerController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public RoleManagerController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            this._context = context;
         }
         public async Task<IActionResult> Index()
         {
@@ -139,6 +142,14 @@ namespace DynamicMenuProject.Controllers
             {
                 try
                 {
+                    //var permission = _context.MenuPermissions.Where(m => Convert.ToString(m.RoleId) == role);
+                    //foreach (var perm in permission)
+                    //{
+                    //    _context.MenuPermissions.Remove(perm);
+                    //}
+                    //var perms = _context.MenuPermissions.FirstOrDefault(m => m.RoleId == role);
+                    //_context.MenuPermissions.Remove(perms);
+                    //_context.SaveChanges();
                     var result = await _roleManager.DeleteAsync(role);
                     if (result.Succeeded)
                     {
